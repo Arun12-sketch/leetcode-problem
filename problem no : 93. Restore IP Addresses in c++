@@ -1,0 +1,26 @@
+class Solution {
+public:
+    vector<string> res;
+    void backtrack(int idx, int dot, string &s, string curr){
+        if(dot==4 && idx==s.size()){
+            curr.pop_back();
+            res.push_back(curr);
+            return;
+        }
+        if(dot==4 || idx==s.size()) return;
+
+        int num=0;
+        for(int i=idx; i<s.size() && i<idx+3; i++){
+            num= num*10 + (s[i]-'0');
+            if(num>255) break;
+            string part = s.substr(idx, i-idx+1);
+            backtrack(i+1, dot+1, s, curr+ part+".");
+            if(s[idx]=='0') break;
+        }
+    }
+    vector<string> restoreIpAddresses(string s) {
+        if(s.size()>12) return res;
+        backtrack(0,0,s,"");
+        return res;
+    }
+};
