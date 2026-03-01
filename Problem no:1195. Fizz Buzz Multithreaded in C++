@@ -1,0 +1,85 @@
+using namespace std;
+
+class FizzBuzz {
+private:
+    int n;
+    mutex m;                 /// Mutex protects shared variable 'i'
+    condition_variable cv;
+    int i;                   // current number
+
+public:
+    FizzBuzz(int n) : n(n), i(1) {}
+
+    // prints "fizz"
+    void fizz(function<void()> printFizz) {
+        while (i <= n) {
+            unique_lock<mutex> lock(m);
+
+            //The thread waits (sleeps) until the condition is satisfied
+            while(i <= n && !(i % 3 == 0 && i % 5 != 0)) {
+                cv.wait(lock);
+            }
+
+            if(i <= n) {
+                printFizz();
+                ++i;
+            }
+
+            // wake up other threads to re-check conditions
+            cv.notify_all();
+        }
+    }
+
+    // prints "buzz"
+    void buzz(function<void()> printBuzz) {
+        while (i <= n) {
+            unique_lock<mutex> lock(m);
+
+            while(i <= n && !(i % 3 != 0 && i % 5 == 0)) {
+                cv.wait(lock);
+            }
+
+            if(i <= n) {
+                printBuzz();
+                ++i;
+            }
+
+            cv.notify_all();
+        }
+    }
+
+    // prints "fizzbuzz"
+    void fizzbuzz(function<void()> printFizzBuzz) {
+        while (i <= n) {
+            unique_lock<mutex> lock(m);
+
+            while(i <= n && !(i % 3 == 0 && i % 5 == 0)) {
+                cv.wait(lock);
+            }
+
+            if(i <= n) {
+                printFizzBuzz();
+                ++i;
+            }
+
+            cv.notify_all();
+        }
+    }
+
+    // prints the number itself
+    void number(function<void(int)> printNumber) {
+        while (i <= n) {
+            unique_lock<mutex> lock(m);
+
+            while(i <= n && !(i % 3 != 0 && i % 5 != 0)) {
+                cv.wait(lock);
+            }
+
+            if(i <= n) {
+                printNumber(i++);
+            }
+
+            cv.notify_all();
+        }
+    }
+};
