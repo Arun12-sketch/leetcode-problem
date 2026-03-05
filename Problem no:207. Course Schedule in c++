@@ -1,0 +1,42 @@
+class Solution {
+public:
+    bool canFinish(int numCourses, vector<vector<int>>& prerequisites) {
+        // Create adjacency list
+        vector<vector<int>> adj(numCourses);
+        vector<int> indegree(numCourses, 0);
+        
+        // Build graph
+        for(int i = 0; i < prerequisites.size(); i++) {
+            int u = prerequisites[i][0];  // Course that depends on
+            int v = prerequisites[i][1];  // Prerequisite course
+            adj[v].push_back(u);  // v must be taken before u
+            indegree[u]++;
+        }
+        
+        // Kahn's algorithm for topological sort
+        queue<int> q;
+        for(int i = 0; i < numCourses; i++) {
+            if(indegree[i] == 0) {
+                q.push(i);
+            }
+        }
+        
+        int count = 0;
+        while(!q.empty()) {
+            int node = q.front();
+            q.pop();
+            count++;
+            
+            // Process neighbors
+            for(int neighbor : adj[node]) {
+                indegree[neighbor]--;
+                if(indegree[neighbor] == 0) {
+                    q.push(neighbor);
+                }
+            }
+        }
+        
+        // If we processed all courses, no cycle exists
+        return count == numCourses;
+    }
+};
