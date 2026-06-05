@@ -1,0 +1,65 @@
+class Solution {
+public:
+bool isonediff(string &word1, string&word2)
+{
+    int diff = 0;
+    for(int i=0; i<word1.length(); i++)
+    {
+       if(word1[i] != word2[i])
+       {
+          diff++;
+       }
+       if(diff > 1) return false;
+    }
+    return diff == 1;
+}
+    int ladderLength(string beginWord, string endWord, vector<string>& wordList) {
+        // 3 step process;
+        //1. push each word into queue
+        //2. check the 2 cond: visited and onediff, then only push otherwise dont
+        //3. keep doing a count++ each time you push
+
+        // check if endword is even there or not 
+        bool found = false;
+        for(string &w : wordList)
+        {
+            if(w == endWord)
+            {
+                found = true;
+                break;
+            }
+        }
+        if(!found) return 0;
+
+        queue<string> q;
+        unordered_set<string> visited; // o(1) time lookup
+        q.push(beginWord);
+        visited.insert(beginWord);
+
+        int level = 1;
+        
+        while(!q.empty())
+        {
+            int size = q.size();
+
+            for(int i=0; i<size; i++)
+            {
+                string cur = q.front();
+                q.pop();
+
+                if(cur == endWord) return level;
+
+            for(auto &word : wordList)
+            {
+                if(!visited.count(word) && isonediff(cur,word))
+                {
+                    q.push(word);
+                    visited.insert(word);
+                }
+            }
+            }
+            level++;
+        }
+       return 0;
+    }
+};
