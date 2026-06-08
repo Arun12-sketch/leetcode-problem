@@ -1,0 +1,42 @@
+class Solution {
+public:
+    int maximumGap(vector<int>& A) {
+        size_t n {A.size()};
+
+        auto shiftAndMask = [=](int x, int sh, int mask)->int{
+            return (x>>sh)&mask;
+        };
+
+        auto countingSort = [&](int sh, int mask)->void{
+            int b = __builtin_popcount(mask);
+            int mx = 1<<b;
+
+            vector<int> C (mx);
+            for (int& ap : A) {
+                int a = shiftAndMask(ap, sh, mask);
+                ++C[a];
+            }
+            for (int i=1; i<mx; ++i) C[i]+=C[i-1];
+
+            vector<int> B (n);
+            for (int i=n-1; i>=0; --i) {
+                int a = shiftAndMask(A[i], sh, mask);
+                int idx = C[a] - 1; // 0-indexed
+                B[idx]=A[i];
+                --C[a];
+            }
+            
+            A = std::move(B);
+        };
+
+        int mk = (1<<15) - 1;
+        countingSort(0, mk);
+        countingSort(15, mk);
+
+        int ans {};
+        for (int i=1; i<n; ++i)
+            ans = max(ans, A[i] - A[i-1]);
+
+        return ans;
+    }
+};
