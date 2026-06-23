@@ -1,0 +1,48 @@
+use std::collections::VecDeque;
+
+impl Solution {
+    pub fn longest_subarray(nums: Vec<i32>, limit: i32) -> i32 {
+        let mut maxd: VecDeque<usize> = VecDeque::new();
+        let mut mind: VecDeque<usize> = VecDeque::new();
+
+        let mut left = 0;
+        let mut ans = 0;
+
+        for right in 0..nums.len() {
+            while let Some(&idx) = maxd.back() {
+                if nums[idx] < nums[right] {
+                    maxd.pop_back();
+                } else {
+                    break;
+                }
+            }
+
+            while let Some(&idx) = mind.back() {
+                if nums[idx] > nums[right] {
+                    mind.pop_back();
+                } else {
+                    break;
+                }
+            }
+
+            maxd.push_back(right);
+            mind.push_back(right);
+
+            while nums[*maxd.front().unwrap()] - nums[*mind.front().unwrap()] > limit {
+                if maxd.front() == Some(&left) {
+                    maxd.pop_front();
+                }
+
+                if mind.front() == Some(&left) {
+                    mind.pop_front();
+                }
+
+                left += 1;
+            }
+
+            ans = ans.max((right - left + 1) as i32);
+        }
+
+        ans
+    }
+}
